@@ -1,0 +1,7 @@
+name = "Patterns"
+uuid = "2ab4f8df-f17a-47f3-bf94-541b2ac2cddd"
+authors = ["Cursor Insight <info@cursorinsight.com>"]
+version = "0.1.0"
+
+[compat]
+julia = "1.7"
