@@ -1,7 +1,7 @@
 ###-----------------------------------------------------------------------------
-### Copyright (C) 2022- Cursor Insight
+### Copyright (C) Patterns.jl
 ###
-### All rights reserved.
+### SPDX-License-Identifier: MIT License
 ###-----------------------------------------------------------------------------
 
 module Patterns
