@@ -1,5 +1,7 @@
 # Patterns.jl
 
+[![CI](https://github.com/cursorinsight/Patterns.jl/actions/workflows/CI.yml/badge.svg)](https://github.com/cursorinsight/Patterns.jl/actions/workflows/CI.yml)
+
 Patterns.jl is a Julia package that provides support for pattern matching.
 
 ## Installation
