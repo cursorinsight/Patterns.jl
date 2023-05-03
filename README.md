@@ -19,16 +19,9 @@ Load the package via
 using Patterns
 ```
 
-This exports two macros, `@with_pattern` and `@pattern`.
+This exports `@pattern` macro.
 
-To use symbols as a pattern in function signatures first create an empty
-function with the usage of `@with_pattern`:
-
-```julia
-@with_pattern function f end
-```
-
-Then you can create functions with pattern in the signature using `@pattern`:
+You can create functions with pattern in the signature using `@pattern`:
 
 ```julia
 @pattern function f(:one)
@@ -39,29 +32,25 @@ end
 You can also use multiple symbols and other parameters in the signature:
 
 ```julia
-@pattern function f(:one, :string)
+@pattern function f(::Type{String}, :one)
     return "1"
-end
-
-@pattern function f(x::Number, :number)
-    return x
 end
 ```
 
+Or you can call a function with pattern. NOTE: all the `Symbol`s are replaced
+in a function call.
+
+```julia
+@assert f(String, :one) == string(f(:one))
+```
 
 ## Advanced example
 
 Create fixtures that provide data for your tests.
 
 ```julia
-@with_pattern function fixture end
-
-@pattern function fixture(:numbers)
-    return [1, 7, 12]
-end
-
-@pattern function fixture(:numbers, x)
-    return [1, 7, 12, x]
+@pattern function fixture(:numbers, :odd)
+    return [1, 7, 11]
 end
 
 @pattern function fixture(:numbers, :even)
@@ -69,10 +58,9 @@ end
 end
 ```
 
-## Notes
+To execute the following test:
 
-### Limitations
-
-Be aware that keyword arguments are currently not working when you are using
-symbols as a pattern in the function signature. This will be added in a future
-update.
+```julia
+@test any(!myiseven, fixture(:numbers, :odd))
+@test all( myiseven, fixture(:numbers, :even))
+```
