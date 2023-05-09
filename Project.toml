@@ -1,7 +1,7 @@
 name = "Patterns"
 uuid = "2ab4f8df-f17a-47f3-bf94-541b2ac2cddd"
 authors = ["Cursor Insight <info@cursorinsight.com>"]
-version = "0.3.0"
+version = "0.3.1"
 
 [deps]
 MacroTools = "1914dd2f-81c6-5fcd-8719-6d5c9610ff09"

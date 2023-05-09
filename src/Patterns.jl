@@ -79,7 +79,7 @@ end
 Abbreviation for `@pattern`.
 """
 macro p(expr...)
-    return :(@pattern $(expr...))
+    return :(@pattern $(expr...)) |> esc
 end
 
 ###-----------------------------------------------------------------------------
