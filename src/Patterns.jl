@@ -60,6 +60,21 @@ julia> @pattern f(:one) + f(:one) == f(:double, 1)
 ```
 """
 macro pattern(expr)
+    return _pattern(expr)
+end
+
+"""
+Abbreviation for `@pattern`.
+"""
+macro p(expr)
+    return _pattern(expr)
+end
+
+###-----------------------------------------------------------------------------
+### Internals
+###-----------------------------------------------------------------------------
+
+function _pattern(expr)::Expr
     if is_definition(expr) # Pattern in function definition
         def::Dict{Symbol, Any} = splitdef(expr)
 
@@ -74,17 +89,6 @@ macro pattern(expr)
         return esc(expr)
     end
 end
-
-"""
-Abbreviation for `@pattern`.
-"""
-macro p(expr...)
-    return :(@pattern $(expr...)) |> esc
-end
-
-###-----------------------------------------------------------------------------
-### Internals
-###-----------------------------------------------------------------------------
 
 is_definition(expr::Expr)::Bool = isshortdef(expr) || expr.head == :function
 is_definition(_)::Bool = false
