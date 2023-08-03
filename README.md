@@ -27,14 +27,14 @@ Load the package via
 using Patterns
 ```
 
-This exports `@pattern` macro.
+This imports `@pattern` macro.
 
-You can create functions with pattern in the signature using `@pattern`:
+You can create functions with a pattern in their signature using `@pattern`:
 
 ```julia
-@pattern function f(:one)
-    return 1
-end
+function f end # need to declare a function before defining a pattern call
+
+@pattern f(:one) = 1
 ```
 
 You can also use multiple symbols and other parameters in the signature:
@@ -45,8 +45,7 @@ You can also use multiple symbols and other parameters in the signature:
 end
 ```
 
-Or you can call a function with pattern. NOTE: all the `Symbol`s are replaced
-in a function call.
+You can call a function with a pattern:
 
 ```julia
 @assert f(String, :one) == string(f(:one))
@@ -54,9 +53,11 @@ in a function call.
 
 ## Advanced example
 
-Create fixtures that provide data for your tests.
+Create fixtures that provide data for your tests:
 
 ```julia
+function fixture end
+
 @pattern function fixture(:numbers, :odd)
     return [1, 7, 11]
 end
@@ -69,6 +70,8 @@ end
 To execute the following test:
 
 ```julia
-@test any(!myiseven, fixture(:numbers, :odd))
-@test all( myiseven, fixture(:numbers, :even))
+using Test
+
+@test !any(iseven, fixture(:numbers, :odd))
+@test  all(iseven, fixture(:numbers, :even))
 ```

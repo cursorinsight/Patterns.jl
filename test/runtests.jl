@@ -10,7 +10,7 @@
 
 using Test
 
-using Patterns: @pattern
+using Patterns: PatternMatchError, @pattern
 
 ###=============================================================================
 ### Tests
@@ -29,76 +29,88 @@ function f end
 @pattern f(:x) = "x"
 
 @test length(methods(f)) == 1
-@test hasmethod(f, Tuple{Val{:x}})
-@test @pattern f(:x) isa String
-@test @pattern f(:x) == "x"
+@test length(methods(var"f(:x)")) == 1
+@test f(:x) isa String
+@test f(:x) == "x"
 
 # Long definition
 @pattern function f(:y)::Char
     return 'y'
 end
 
-@test length(methods(f)) == 2
-@test hasmethod(f, Tuple{Val{:y}})
-@test @pattern f(:y) isa Char
-@test @pattern f(:y) == 'y'
+@test length(methods(f)) == 1
+@test length(methods(var"f(:y)")) == 1
+@test f(:y) isa Char
+@test f(:y) == 'y'
 
 # Token with argument signature and keyword argument
 @pattern function f(:y, num::Integer; f::Function = identity)
     return f(num)
 end
 
-@test length(methods(f)) == 3
-@test hasmethod(f, Tuple{Val{:y}, Integer})
-@test @pattern f(:y, 42) == 42
-@test @pattern f(:y, 42; f = sign) == +1
+@test length(methods(f)) == 1
+@test length(methods(var"f(:y, _)")) == 1
+@test f(:y) isa Char
+@test f(:y) == 'y'
+@test f(:y, 42) == 42
+@test f(:y, 42; f = sign) == +1
 
-# More token signature
+# Multiple tokens signature
 @pattern function f(:a, :b, :c)
     return :abc
 end
 
-@test length(methods(f)) == 4
-@test hasmethod(f, Tuple{Val{:a}, Val{:b}, Val{:c}})
-@test @pattern f(:a, :b, :c) !== :abc
-@test (@pattern f(:a, :b, :c)) == :abc
+@test length(methods(f)) == 1
+@test length(methods(var"f(:a, :b, :c)")) == 1
+@test f(:a, :b, :c) == :abc
 
 # Token and parametric type
 @pattern function f(:d, str::T) where {T <: AbstractString}
     return str
 end
 
-@test length(methods(f)) == 5
-@test hasmethod(f, Tuple{Val{:d}, AbstractString})
-@test @pattern f(:d, "something") == "something"
+@test length(methods(f)) == 1
+@test length(methods(var"f(:d, _)")) == 1
+@test f(:d, "something") == "something"
 
-# Type based signature
-@pattern function f(::Type{Int})
+# Type based signature (no pattern)
+function f(::Type{Int})
     return 123
 end
 
-@test length(methods(f)) == 6
+@test length(methods(f)) == 2
 @test hasmethod(f, Tuple{Type{Int}})
-@test @pattern f(Int) == 123
+@test f(Int) == 123
 
 # Type based signature with token
 @pattern function f(::Type{Int}, :zero)
     return 0
 end
 
-@test length(methods(f)) == 7
-@test hasmethod(f, Tuple{Type{Int}, Val{:zero}})
-@test @pattern f(Int, :zero) == 0
-@test @pattern f(Int) * f(Int, :zero) == 0
+@test length(methods(f)) == 2
+@test length(methods(var"f(_, :zero)")) == 1
+@test f(Int, :zero) == 0
+@test f(Int) * f(Int, :zero) == 0
 
 # Broadcast
 @pattern function f(::Type{Int}, :one)
     return 1
 end
 
-@test length(methods(f)) == 8
-@test hasmethod(f, Tuple{Type{Int}, Val{:one}})
-@test @pattern sum(f.(Int, [:zero, :one, :zero, :one])) == 2
+@test length(methods(f)) == 2
+@test length(methods(var"f(_, :one)")) == 1
+@test sum(f.(Int, [:zero, :one, :zero, :one])) == 2
 
-@test_throws MethodError f(:missing, :signature)
-@test 2 == @pattern 1+1
+# Splat
+
+@pattern f(:splat, x...) = sum(x; init = 0)
+
+@test f(:splat) == 0
+@test f(:splat, 1, 2, 3) == 6
+
+# Ambiguity, missing patterns
+
+@pattern f(:splat) = 0
+
+@test_throws PatternMatchError f(:splat)
+@test_throws PatternMatchError f(:missing, :signature)
