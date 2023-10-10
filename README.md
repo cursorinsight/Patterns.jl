@@ -6,9 +6,17 @@ Patterns.jl is a Julia package that provides support for pattern matching.
 
 ## Installation
 
+Patterns.jl can be installed after adding Cursor Insight's [own registry][CIJR]
+to the Julia environment:
+
 ```julia
-julia>]
-pkg> add https://github.com/cursorinsight/Patterns.jl
+julia> ]
+pkg> registry add https://github.com/cursorinsight/julia-registry
+     Cloning registry from "https://github.com/cursorinsight/julia-registry"
+       Added registry `CursorInsightJuliaRegistry` to
+       `~/.julia/registries/CursorInsightJuliaRegistry`
+
+pkg> add Patterns
 ```
 
 ## Usage
@@ -64,3 +72,5 @@ To execute the following test:
 @test any(!myiseven, fixture(:numbers, :odd))
 @test all( myiseven, fixture(:numbers, :even))
 ```
+
+[CIJR]: https://github.com/cursorinsight/julia-registry
